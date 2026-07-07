@@ -27,7 +27,7 @@ void PSNTracker::resetFrameData()
 
     status = 0;
 
-    present = 0;
+    presentflags = 0;
 }
 PSNTracker&
 PSNTracker::setName(const char* text)
