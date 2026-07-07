@@ -30,7 +30,7 @@ public:
 
     void clear();
 
-    uint16_t id;
+    
 
     char name[psn::MaxTrackerNameLength];
 
