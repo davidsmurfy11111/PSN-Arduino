@@ -124,3 +124,73 @@ bool PSNWriter::writeString(
 
     return writeBytes(text, length);
 }
+uint32_t PSNWriter::makeHeader(
+    uint16_t id,
+    uint16_t length,
+    bool hasSubChunks)
+{
+    uint32_t header =
+        static_cast<uint32_t>(id);
+
+    header |=
+        (static_cast<uint32_t>(length & 0x7FFF) << 16);
+
+    if (hasSubChunks)
+        header |= 0x80000000UL;
+
+    return header;
+}
+bool PSNWriter::patchU32(
+    uint16_t offset,
+    uint32_t value)
+{
+    if ((offset + 4) > m_capacity)
+        return false;
+
+    m_buffer[offset + 0] = value & 0xFF;
+    m_buffer[offset + 1] = (value >> 8) & 0xFF;
+    m_buffer[offset + 2] = (value >> 16) & 0xFF;
+    m_buffer[offset + 3] = (value >> 24) & 0xFF;
+
+    return true;
+}
+bool PSNWriter::beginChunk(
+    uint16_t id,
+    bool hasSubChunks)
+{
+    if (m_depth >= MaxDepth)
+        return false;
+
+    if (!reserve(4))
+        return false;
+
+    Chunk& chunk = m_stack[m_depth++];
+
+    chunk.offset = m_position;
+    chunk.id = id;
+    chunk.hasSubChunks = hasSubChunks;
+
+    m_position += 4;
+
+    return true;
+}
+bool PSNWriter::endChunk()
+{
+    if (m_depth == 0)
+        return false;
+
+    Chunk chunk = m_stack[--m_depth];
+
+    uint16_t payloadLength =
+        m_position - chunk.offset - 4;
+
+    uint32_t header =
+        makeHeader(
+            chunk.id,
+            payloadLength,
+            chunk.hasSubChunks);
+
+    return patchU32(
+        chunk.offset,
+        header);
+}
