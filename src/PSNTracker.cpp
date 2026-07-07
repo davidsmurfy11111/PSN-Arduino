@@ -10,7 +10,7 @@ PSNTracker::PSNTracker()
 
     clearFrame();
 }
-void PSNTracker::clearFrame()
+void PSNTracker::resetFrameData()
 {
     position.set(0.0f,0.0f,0.0f);
 
