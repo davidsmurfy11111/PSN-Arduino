@@ -4,7 +4,7 @@
 
 PSNTracker::PSNTracker()
 {
-    id = 0;
+    
 
     name[0] = '\0';
 
