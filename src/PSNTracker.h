@@ -47,7 +47,7 @@ public:
 
     uint32_t status;
 
-    uint16_t present;
+    uint16_t presentflags;
 
     //------------------------------------------
     // Setters
